@@ -1,17 +1,30 @@
 import React from "react";
 
-const TableRow = () => {
+const TableRow = ({
+	image,
+	firstName,
+	lastName,
+	state,
+	city,
+	dob,
+	age,
+	email,
+	username,
+}) => {
 	return (
 		<tr>
 			<td>
-				<img src="" className="uk-preserve-width uk-border-circle" alt="" />
+				<img
+					src={image}
+					className="uk-preserve-width uk-border-circle"
+					alt={`${firstName} ${lastName}`}
+				/>
 			</td>
-			<td>Name</td>
-			<td>DOB</td>
-			<td>Gender</td>
-			<td>Location</td>
-			<td>Email</td>
-			<td>Username</td>
+			<td>{`${firstName} ${lastName}`}</td>
+			<td>{new Date(dob).toLocaleDateString()}</td>
+			<td>{`${city}, ${state}`}</td>
+			<td>{email}</td>
+			<td>{username}</td>
 		</tr>
 	);
 };
