@@ -19,6 +19,37 @@ class Table extends React.Component {
 		});
 	}
 
+	componentDidUpdate(prevProps) {
+		if (
+			prevProps.filterText !== this.props.filterText ||
+			prevProps.filterOption !== this.props.filterOption
+		) {
+			const text = this.props.filterText.toLowerCase().trim();
+			const filteredEmployees = this.state.employeeList.filter(employee => {
+				switch (this.props.filterOption) {
+					case "name":
+						return `${employee.name.first} ${employee.name.last}`
+							.toLowerCase()
+							.includes(text);
+					case "age":
+						return employee.dob.age === parseInt(text);
+					case "location":
+						return `${employee.location.city}, ${employee.location.state}`
+							.toLowerCase()
+							.includes(text);
+					case "email":
+						return employee.email.toLowerCase().includes(text);
+					case "username":
+						return employee.login.username.toLowerCase().includes(text);
+					default:
+						return null;
+				}
+			});
+
+			this.setState({ employees: filteredEmployees });
+		}
+	}
+
 	renderRows = () => {
 		return this.state.employees.map(employee => {
 			return (
