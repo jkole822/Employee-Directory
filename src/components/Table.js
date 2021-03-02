@@ -2,24 +2,27 @@ import React from "react";
 import axios from "axios";
 
 import TableRow from "./TableRow";
+import TableHeader from "./TableHeader";
 
 class Table extends React.Component {
 	state = {
 		employeeList: [],
 		employees: [],
+		sortCategory: "name",
+		sortOrder: true,
 	};
 
 	async componentDidMount() {
-		const res = await axios.get(
-			"https://randomuser.me/api/?results=500&nat=us"
-		);
+		const res = await axios.get("https://randomuser.me/api/?results=10&nat=us");
 		this.setState({
 			employeeList: res.data.results,
 			employees: res.data.results,
 		});
+
+		this.sortEmployees();
 	}
 
-	componentDidUpdate(prevProps) {
+	componentDidUpdate(prevProps, prevState) {
 		if (
 			prevProps.filterText !== this.props.filterText ||
 			prevProps.filterOption !== this.props.filterOption
@@ -47,6 +50,11 @@ class Table extends React.Component {
 			});
 
 			this.setState({ employees: filteredEmployees });
+		} else if (
+			prevState.sortCategory !== this.state.sortCategory ||
+			prevState.sortOrder !== this.state.sortOrder
+		) {
+			this.sortEmployees();
 		}
 	}
 
@@ -69,18 +77,100 @@ class Table extends React.Component {
 		});
 	};
 
+	handleClick = sortCategory => {
+		if (this.state.sortCategory === sortCategory) {
+			this.setState({ sortOrder: !this.state.sortOrder });
+		} else {
+			this.setState({ sortOrder: true });
+		}
+
+		this.setState({ sortCategory });
+	};
+
+	sortEmployees = () => {
+		const sortedEmployees = this.state.employees.sort((a, b) => {
+			switch (this.state.sortCategory) {
+				case "name":
+					return this.state.sortOrder
+						? a.name.last < b.name.last
+							? -1
+							: 1
+						: a.name.last > b.name.last
+						? -1
+						: 1;
+				case "dob":
+					return this.state.sortOrder
+						? new Date(a.dob.date).getTime() - new Date(b.dob.date).getTime()
+						: new Date(b.dob.date).getTime() - new Date(a.dob.date).getTime();
+				case "location":
+					return this.state.sortOrder
+						? a.location.city < b.location.city
+							? -1
+							: 1
+						: a.location.city > b.location.city
+						? -1
+						: 1;
+				case "email":
+					return this.state.sortOrder
+						? a.email < b.email
+							? -1
+							: 1
+						: a.email > b.email
+						? -1
+						: 1;
+				case "username":
+					return this.state.sortOrder
+						? a.login.username < b.login.username
+							? -1
+							: 1
+						: a.login.username > b.login.username
+						? -1
+						: 1;
+				default:
+					return null;
+			}
+		});
+
+		this.setState({ employees: sortedEmployees });
+	};
+
 	render() {
 		return (
 			<div>
 				<table className="uk-table uk-table-striped uk-table-justify">
 					<thead>
 						<tr>
-							<th className="uk-table-shrink"></th>
-							<th>Name</th>
-							<th>DOB</th>
-							<th>Location</th>
-							<th>Email</th>
-							<th>Username</th>
+							<TableHeader uiClass="uk-table-shrink" />
+							<TableHeader
+								currentCategory={this.state.sortCategory}
+								currentOrder={this.state.sortOrder}
+								title="Name"
+								selectCategory={this.handleClick}
+							/>
+							<TableHeader
+								currentCategory={this.state.sortCategory}
+								currentOrder={this.state.sortOrder}
+								title="DOB"
+								selectCategory={this.handleClick}
+							/>
+							<TableHeader
+								currentCategory={this.state.sortCategory}
+								currentOrder={this.state.sortOrder}
+								title="Location"
+								selectCategory={this.handleClick}
+							/>
+							<TableHeader
+								currentCategory={this.state.sortCategory}
+								currentOrder={this.state.sortOrder}
+								title="Email"
+								selectCategory={this.handleClick}
+							/>
+							<TableHeader
+								currentCategory={this.state.sortCategory}
+								currentOrder={this.state.sortOrder}
+								title="Username"
+								selectCategory={this.handleClick}
+							/>
 						</tr>
 					</thead>
 					<tbody>{this.renderRows()}</tbody>
