@@ -2,6 +2,7 @@ import React from "react";
 import Form from "./components/Form";
 import Table from "./components/Table";
 import Pagination from "./components/Pagination";
+import "./App.css";
 
 class App extends React.Component {
 	state = {
@@ -46,18 +47,26 @@ class App extends React.Component {
 
 	render() {
 		return (
-			<div className="uk-container">
-				<h1 className="uk-text-center uk-margin-top uk-margin-large-bottom">
+			<div>
+				<h1
+					id="header"
+					className="uk-text-center uk-padding uk-margin-large-bottom"
+				>
 					Employee Directory
 				</h1>
-				<Form filterSubmit={this.handleSubmit} filterReset={this.handleReset} />
-				{this.renderPagination()}
-				<Table
-					getPageCount={pageCount => this.setState({ pageCount })}
-					currentPage={this.state.currentPage}
-					filterText={this.state.filterText}
-					filterOption={this.state.filterOption}
-				/>
+				<div className="uk-container">
+					<Form
+						filterSubmit={this.handleSubmit}
+						filterReset={this.handleReset}
+					/>
+					{this.renderPagination()}
+					<Table
+						getPageCount={pageCount => this.setState({ pageCount })}
+						currentPage={this.state.currentPage}
+						filterText={this.state.filterText}
+						filterOption={this.state.filterOption}
+					/>
+				</div>
 			</div>
 		);
 	}
