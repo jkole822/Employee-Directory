@@ -6,6 +6,7 @@ import TableHeader from "./TableHeader";
 
 class Table extends React.Component {
 	state = {
+		data: [],
 		employeeList: [],
 		employees: [],
 		sortCategory: "name",
@@ -13,22 +14,39 @@ class Table extends React.Component {
 	};
 
 	async componentDidMount() {
-		const res = await axios.get("https://randomuser.me/api/?results=10&nat=us");
+		const res = await axios.get(
+			"https://randomuser.me/api/?results=100&nat=us"
+		);
+
+		const pageCount = Math.ceil(res.data.results.length / 10);
+		this.props.getPageCount(pageCount);
+
 		this.setState({
-			employeeList: res.data.results,
-			employees: res.data.results,
+			employeeList: [...res.data.results],
+			data: [...res.data.results],
 		});
 
 		this.sortEmployees();
 	}
 
-	componentDidUpdate(prevProps, prevState) {
+	resetEmployeeList = async () => {
+		await this.setState({
+			employeeList: [...this.state.data],
+		});
+
+		const pageCount = Math.ceil(this.state.data.length / 10);
+		this.props.getPageCount(pageCount);
+
+		this.sortEmployees();
+	};
+
+	async componentDidUpdate(prevProps, prevState) {
 		if (
 			prevProps.filterText !== this.props.filterText ||
 			prevProps.filterOption !== this.props.filterOption
 		) {
 			const text = this.props.filterText.toLowerCase().trim();
-			const filteredEmployees = this.state.employeeList.filter(employee => {
+			const filteredEmployees = this.state.data.filter(employee => {
 				switch (this.props.filterOption) {
 					case "name":
 						return `${employee.name.first} ${employee.name.last}`
@@ -45,37 +63,27 @@ class Table extends React.Component {
 					case "username":
 						return employee.login.username.toLowerCase().includes(text);
 					default:
-						return null;
+						return this.resetEmployeeList();
 				}
 			});
 
-			this.setState({ employees: filteredEmployees });
+			if (this.props.filterOption) {
+				const pageCount = Math.ceil(filteredEmployees.length / 10);
+				this.props.getPageCount(pageCount);
+
+				await this.setState({ employeeList: filteredEmployees });
+
+				this.sortEmployees();
+			}
 		} else if (
 			prevState.sortCategory !== this.state.sortCategory ||
 			prevState.sortOrder !== this.state.sortOrder
 		) {
 			this.sortEmployees();
+		} else if (prevProps.currentPage !== this.props.currentPage) {
+			this.paginateEmployees();
 		}
 	}
-
-	renderRows = () => {
-		return this.state.employees.map(employee => {
-			return (
-				<TableRow
-					key={employee.login.sha256}
-					image={employee.picture.thumbnail}
-					firstName={employee.name.first}
-					lastName={employee.name.last}
-					state={employee.location.state}
-					city={employee.location.city}
-					dob={employee.dob.date}
-					age={employee.dob.age}
-					email={employee.email}
-					username={employee.login.username}
-				/>
-			);
-		});
-	};
 
 	handleClick = sortCategory => {
 		if (this.state.sortCategory === sortCategory) {
@@ -87,8 +95,8 @@ class Table extends React.Component {
 		this.setState({ sortCategory });
 	};
 
-	sortEmployees = () => {
-		const sortedEmployees = this.state.employees.sort((a, b) => {
+	sortEmployees = async () => {
+		const sortedEmployees = [...this.state.employeeList].sort((a, b) => {
 			switch (this.state.sortCategory) {
 				case "name":
 					return this.state.sortOrder
@@ -131,12 +139,41 @@ class Table extends React.Component {
 			}
 		});
 
-		this.setState({ employees: sortedEmployees });
+		await this.setState({ employeeList: sortedEmployees });
+		this.paginateEmployees();
+	};
+
+	paginateEmployees = () => {
+		const firstIndex = (this.props.currentPage - 1) * 10;
+		const secondIndex = (this.props.currentPage - 1) * 10 + 10;
+
+		this.setState({
+			employees: this.state.employeeList.slice(firstIndex, secondIndex),
+		});
+	};
+
+	renderRows = () => {
+		return this.state.employees.map(employee => {
+			return (
+				<TableRow
+					key={employee.login.sha256}
+					image={employee.picture.thumbnail}
+					firstName={employee.name.first}
+					lastName={employee.name.last}
+					state={employee.location.state}
+					city={employee.location.city}
+					dob={employee.dob.date}
+					age={employee.dob.age}
+					email={employee.email}
+					username={employee.login.username}
+				/>
+			);
+		});
 	};
 
 	render() {
 		return (
-			<div>
+			<div className="uk-overflow-auto">
 				<table className="uk-table uk-table-striped uk-table-justify">
 					<thead>
 						<tr>
