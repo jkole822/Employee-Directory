@@ -7,8 +7,10 @@
     "@testing-library/react": "^11.2.5",
     "@testing-library/user-event": "^12.8.0",
     "axios": "^0.21.1",
+    "formik": "^2.2.6",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
+    "react-responsive": "^8.2.0",
     "react-scripts": "4.0.3",
     "uikit": "^3.6.17",
     "web-vitals": "^0.2.4",
@@ -23,7 +25,8 @@
     "workbox-range-requests": "^5.1.4",
     "workbox-routing": "^5.1.4",
     "workbox-strategies": "^5.1.4",
-    "workbox-streams": "^5.1.4"
+    "workbox-streams": "^5.1.4",
+    "yup": "^0.32.9"
   },
   "scripts": {
     "start": "react-scripts start",
