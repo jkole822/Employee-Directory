@@ -177,7 +177,7 @@ class Table extends React.Component {
 	render() {
 		return (
 			<div className="uk-overflow-auto">
-				<table className="uk-table uk-table-striped uk-table-justify">
+				<table className="uk-table uk-table-striped">
 					<thead>
 						<tr>
 							<TableHeader uiClass="uk-table-shrink" />
