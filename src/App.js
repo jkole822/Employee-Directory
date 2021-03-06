@@ -33,6 +33,10 @@ class App extends React.Component {
 		this.setState({ filterOption: "", filterText: "" });
 	};
 
+	handleCurrentPageReset = () => {
+		this.setState({ currentPage: 1 });
+	};
+
 	renderPagination = () => {
 		return this.state.pageCount > 1 ? (
 			<div className="uk-flex uk-flex-center uk-margin">
@@ -61,6 +65,7 @@ class App extends React.Component {
 					/>
 					{this.renderPagination()}
 					<Table
+						handleCurrentPageReset={this.handleCurrentPageReset}
 						getPageCount={pageCount => this.setState({ pageCount })}
 						currentPage={this.state.currentPage}
 						filterText={this.state.filterText}

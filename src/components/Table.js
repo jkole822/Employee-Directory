@@ -73,6 +73,8 @@ class Table extends React.Component {
 
 				await this.setState({ employeeList: filteredEmployees });
 
+				this.props.handleCurrentPageReset();
+
 				this.sortEmployees();
 			}
 		} else if (
@@ -140,6 +142,7 @@ class Table extends React.Component {
 		});
 
 		await this.setState({ employeeList: sortedEmployees });
+
 		this.paginateEmployees();
 	};
 
